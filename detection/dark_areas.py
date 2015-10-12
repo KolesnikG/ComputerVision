@@ -67,6 +67,6 @@ for i in range(0,len(c)):
         cv2.ellipse(img, ell, (0,255,0), 2)
         box=np.int0(cv2.boxPoints(cv2.minAreaRect(c[i])))
         cv2.drawContours(img,[box],0,(0,0,255),1)
-
+print(contours)
 cv2.imwrite(name,img)
 print('Image was saved in program folder(dest) with name:',name)

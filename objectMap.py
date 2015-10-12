@@ -4,10 +4,10 @@ import cv2
 import numpy as np
 
 
-img=cv2.imread("img/1.jpg",0)
+img=cv2.imread("otsu1.jpg",0)
 
-ret,img=cv2.threshold(img,0,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
-img=cv2.medianBlur(img,11)
+ret,img=cv2.threshold(img,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+
 
 cur=1;
 def numerated(img):
@@ -74,7 +74,7 @@ def get_bigvalue(img,cur):
 
 bigv=get_bigvalue(img,cur)
 contour=[[] for i in range(len(bigv))]
-
+print(contour)
 img=filter(img,bigv)
 
 
@@ -93,52 +93,27 @@ def find_boundary(img,bigv):
 bound_point=find_boundary(img,bigv)
 
 def contour_obj(boundary_point):
-    t=0
-    while(t<len(boundary_point)):
-        i,j=boundary_point[t]
-        si,sj=i,j
-        img[i][j]=1
-        k=0
-        while k<8:
-                m,n=neighbors[k]
-                if (img[i+m][j+n]!=1) and (img[i+m][j+n]!=bigv[t]):
-                    if k==7:
-                        k=0
-                    else:
-                        k+=1
+    i,j=boundary_point[0]
+    si,sj=i,j
+    img[i][j]=1
+    k=0
+    while k<8:
+            m,n=neighbors[k]
+            if (img[i+m][j+n]!=1) and (img[i+m][j+n]!=bigv[0]):
+                if k==7:
+                    k=0
                 else:
-                    j,i=j+n,i+m
-                    contour[t]+=[(i,j)]
-                    img[i][j]=1
-                    k-=1
-                    if i==si and j==sj:
-                        break
-        t+=1
-    return img,contour
+                    k+=1
+            else:
+                j,i=j+n,i+m
+                contour[0]+=[(i,j)]
+                img[i][j]=1
+                k-=1
+                if i==si and j==sj:
+                    break
 
 
+img=contour_obj(bound_point)
 
 
-img,contour=contour_obj(bound_point)
-
-def fit_contour(contour):
-    coord=[[0,0,0,0] for i in range(len(contour))]
-    k=0;
-    while(k<len(contour)):
-        l1=[];l2=[]
-        for i in range(0,len(contour[k])):
-            l1+=[contour[k][i][0]]
-            l2+=[contour[k][i][1]]
-        coord[k]=(np.amin(l2),np.amin(l1)),(np.amax(l2),np.amax(l1))
-        k+=1
-    return coord
-
-coord=fit_contour(contour)
-print(coord)
-
-img1=cv2.imread("img/1.jpg")
-
-for i in range(0,len(coord)):
-    img1=cv2.rectangle(img1,coord[i][0],coord[i][1],(0,0,255),2)
-
-cv2.imwrite("img/final.jpg",img1)
+print_img(img)
